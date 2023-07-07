@@ -1,0 +1,7 @@
+name = "Tools"
+uuid = "2aed01e1-a8db-4e67-96fc-9ccdf593ebce"
+authors = ["Michel Verstraete <MMVerstraete@gmail.com> and contributors"]
+version = "1.0.0"
+
+[compat]
+julia = "1.8"
