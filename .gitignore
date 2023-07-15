@@ -1,6 +1,4 @@
 .DS_Store
-/docs/build/
-docs/build/
 src/.DS_Store
 test/.DS_Store
 test/src/.DS_Store

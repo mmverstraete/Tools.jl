@@ -3,5 +3,12 @@ uuid = "2aed01e1-a8db-4e67-96fc-9ccdf593ebce"
 authors = ["Michel Verstraete <MMVerstraete@gmail.com> and contributors"]
 version = "1.0.0"
 
+[deps]
+Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
+JMtk15 = "6c71635d-e68b-418f-880a-c8128ca9dc0a"
+StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
+Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
 [compat]
 julia = "1.8"
