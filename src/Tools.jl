@@ -38,10 +38,10 @@ export Tools_test
 # Include and export functions:
 include(Tools_src * "get_orbit_date.jl")
 export get_orbit_date
+include(Tools_src * "hr2lr.jl")
+export hr2lr
 include(Tools_src * "is_from_misr_path.jl")
 export is_from_misr_path
-include(Tools_src * "is_valid_ftype.jl")
-export is_valid_ftype
 include(Tools_src * "is_valid_misr_band.jl")
 export is_valid_misr_band
 include(Tools_src * "is_valid_misr_block.jl")
@@ -54,8 +54,6 @@ include(Tools_src * "is_valid_misr_path.jl")
 export is_valid_misr_path
 include(Tools_src * "is_valid_misr_prdct.jl")
 export is_valid_misr_prdct
-include(Tools_src * "is_valid_misr_resolution.jl")
-export is_valid_misr_resolution
 include(Tools_src * "is_valid_misr_site.jl")
 export is_valid_misr_site
 include(Tools_src * "is_valid_misr_subprdct.jl")
@@ -66,6 +64,10 @@ include(Tools_src * "is_valid_misrhr_prdct.jl")
 export is_valid_misrhr_prdct
 include(Tools_src * "is_valid_misrhr_subprdct.jl")
 export is_valid_misrhr_subprdct
+include(Tools_src * "is_valid_resolution.jl")
+export is_valid_resolution
+include(Tools_src * "lr2hr.jl")
+export lr2hr
 include(Tools_src * "make_dates.jl")
 export make_dates
 include(Tools_src * "make_location.jl")
@@ -76,20 +78,24 @@ include(Tools_src * "make_misr_fpath.jl")
 export make_misr_fpath
 include(Tools_src * "make_misr_fspec.jl")
 export make_misr_fspec
+include(Tools_src * "make_misrhr_fname.jl")
+export make_misrhr_fname
+include(Tools_src * "make_misrhr_fpath.jl")
+export make_misrhr_fpath
+include(Tools_src * "make_misrhr_fspec.jl")
+export make_misrhr_fspec
 include(Tools_src * "make_versions.jl")
 export make_versions
-include(Tools_src * "set_misr_resol.jl")
-export set_misr_resol
 include(Tools_src * "set_misr_specs.jl")
 export set_misr_specs
 include(Tools_src * "set_misr_version.jl")
 export set_misr_version
-include(Tools_src * "make_misrhr_fname.jl")
-export make_misrhr_fname
 include(Tools_src * "set_misrhr_version.jl")
 export set_misrhr_version
 include(Tools_src * "set_mroots.jl")
 export set_mroots
+include(Tools_src * "set_resolution.jl")
+export set_resolution
 include(Tools_src * "split_location.jl")
 export split_location
 include(Tools_src * "split_misr_fname.jl")
