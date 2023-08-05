@@ -1,5 +1,5 @@
 """
-    dates, date1, date2, date3 = make_dates_tst_1100()
+    from_date, until_date, today_date, from_str, until_str, today_str, dates_str = make_dates_tst_1100()
 
 # Purpose(s):
 * Generate the output of `make_dates.jl` for testing purposes. Test 1100: Using the two positional arguments.
@@ -9,10 +9,13 @@
 # Keyword argument(s): None.
 
 # Return value(s):
-* `dates::AbstractString`: The string needed to generate a MISRHR filename.
-* `date1::Dates`: The first date.
-* `date2::Dates`: The second date.
-* `date3::Dates`: The third date.
+* `from_date::Dates`: The starting date of the period of interest.
+* `until_date::Dates`: The ending date of the period of interest.
+* `today_date::Dates`: The date of execution of this function.
+* `from_str::AbstractString`: The starting date of the period of interest, formatted as `yyyy-mm-dd`.
+* `until_str::AbstractString`: The ending date of the period of interest, formatted as `yyyy-mm-dd`.
+* `today_str::AbstractString`: The date of execution of this function, formatted as `yyyy-mm-dd`.
+* `dates_str::AbstractString`: The string containing all three dates required to generate a MISRHR filename.
 
 # Licensing:
 * Copyright © 2023 Michel M. Verstraete,
@@ -25,26 +28,35 @@ julia> using Tools
 julia> include(Tools_test * "make_dates_tst_1100.jl")
 make_dates_tst_1100
 
-julia> dates, date1, date2, date3 = make_dates_tst_1100();
+julia> from_date, until_date, today_date, from_str, until_str, today_str, dates_str = make_dates_tst_1100();
 
-julia> @test dates == "2012-06-13+2014-06-28+" * Dates.format(today(), "yyyy-mm-dd")
+julia> @test from_date == Date("2012-06-13")
 Test Passed
 
-julia> @test date1 == Date("2012-06-13")
+julia> @test until_date == Date("2014-06-28")
 Test Passed
 
-julia> @test date2 == Date("2014-06-28")
+julia> @test today_date == Dates.today()
 Test Passed
 
-julia> @test date3 == today()
+julia> @test from_str == "2012-06-13"
+Test Passed
+
+julia> @test until_str == "2014-06-28"
+Test Passed
+
+julia> @test today_str == Dates.format(today_date, "yyyy-mm-dd")
+Test Passed
+
+julia> @test dates_str == from_str * '+' * until_str * '+' * today_str
 Test Passed
 ```
 """
 function make_dates_tst_1100(
-    )::Tuple{AbstractString, Date, Date, Date}
+    )::Tuple{Date, Date, Date, AbstractString, AbstractString, AbstractString, AbstractString}
 
-    dates, date1, date2, date3 = make_dates("2012-06-13", "2014-06-28")
+    from_date, until_date, today_date, from_str, until_str, today_str, dates_str = make_dates("2012-06-13", "2014-06-28")
 
-    return dates, date1, date2, date3
+    return from_date, until_date, today_date, from_str, until_str, today_str, dates_str
 
 end
