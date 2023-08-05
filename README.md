@@ -2,7 +2,7 @@
 
 [![Code Style: Blue](https://img.shields.io/badge/code%20style-blue-4495d1.svg)](https://github.com/invenia/BlueStyle)
 
-Welcome to [Tools](https://github.com/mmverstraete/Tools), a Julia language package that offers generic tools to manipulate MISR and MISRHR variables and data files. This package depends in part, and largely expands on, the functionality provided by the some of those functions may rely on the [JMtk15](https://github.com/mmverstraete/) package.
+Welcome to [Tools](https://github.com/mmverstraete/Tools), a Julia language package that offers generic tools to manipulate MISR and MISRHR variables and data files. This package depends in part, and largely expands on, the functionality provided by [JMtk15](https://github.com/mmverstraete/) package.
 
 The UUID of this package is 2aed01e1-a8db-4e67-96fc-9ccdf593ebce.
 
