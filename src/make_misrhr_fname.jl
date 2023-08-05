@@ -5,7 +5,7 @@
         misr_path1 = misr_path1, misr_path2 = misr_path2,
         misr_orbit1 = misr_orbit1, misr_orbit2 = misr_orbit2,
         misr_block1 = misr_block1, misr_block2 = misr_block2,
-        misr_site = misr_site, strdate1 = strdate1, strdate2 = strdate2,
+        misr_site = misr_site, from = from, until = until,
         misr_version = misr_version, misrhr_version = misrhr_version, ext = ext)
 
 # Purpose(s):
@@ -28,8 +28,8 @@
 * `misr_block1::Union{Integer, Nothing} = nothing`: The first (or only) MISR Block number.
 * `misr_block2::Union{Integer, Nothing} = nothing`: The last MISR Block number.
 * `misr_site::Union{AbstractString, Nothing} = nothing`: The MISR Local Mode Site name.
-* `strdate1::Union{AbstractString, Nothing} = nothing`: The string representation of the starting date of the period of interest, formatted as "yyyy-mm-dd".
-* `strdate2::Union{AbstractString, Nothing} = nothing`: The string representation of the ending date of the period of interest, formatted as "yyyy-mm-dd".
+* `from::Union{AbstractString, Nothing} = nothing`: The string representation of the starting date of the period of interest, formatted as "yyyy-mm-dd".
+* `until::Union{AbstractString, Nothing} = nothing`: The string representation of the ending date of the period of interest, formatted as "yyyy-mm-dd".
 * `misr_version::Union{AbstractString, Nothing} = nothing`: The version label for the main MISR data product.
 * `misrhr_version::Union{AbstractString, Nothing} = nothing`: The version label for the MISRHR processing system.
 * `ext::Union{AbstractString, Nothing} = nothing`: The file extension.
@@ -38,7 +38,7 @@
 * `misrhr_fname::AbstractString`: The name of the MISRHR output file.
 
 # Algorithm:
-* This function relies on functions `make_location.jl`, `make_dates.jl` and `make_versions.jl` to provide the values of the filename elements `location`, `dates`, and `versions`, respectively, and generates the filename composed of 8 elements, separated by underscore characters, and formatted as
+* This function relies on functions `make_location.jl`, `make_dates.jl` and `make_versions.jl` to provide the values of the filename elements `location`, `dates`, and `versions`, respectively, and generates the filename composed of 8 elements, separated by underscore characters, plus a file extension, and formatted as
 
 `ftype_prdct_subprdct_qualifier_resolution_location_dates_versions.ext`
 
@@ -50,33 +50,34 @@
     [MIT license](https://opensource.org/licenses/MIT).
 
 # Note(s):
-* The MISRHR processing system assumes that all product filenames contain 8 elements (aside from the file extension) separated by an underscore (`_`), so that character should not be part of any one of the filename elements. For instance, since MISR Local Site names are formatted as `SITE_NAME`, function `make_location.jl` replaces it by a dash (`-`). Similarly, function `make_versions.jl` replaces underscores by dashes in MISR version labels.
-* The positional arguments `ftype`, `prdct`, and `subprdct` are mandatory and must take on recognized values (validated by the functions `is_valid_misrhr_ftype`, `is_valid_misr_prdct` or `is_valid_misrhr_prdct`, `is_valid_misr_subprdct` or `is_valid_misrhr_subprdct`).
-* The keyword argument `qualifier` can take on any value. However, if set to a null string, its value is reset to `main`.
-* The keyword argument `resolution` must be set to a recognized value within the MISRHR processing system. However, if unspecified, its value is derived from the the positional argument `prdct`, and optionally from the keyword arguments `misr_camera` and `misr_band`.
-* The keyword arguments `misr_camera` and `misr_band` do not contribute directly to the filename but are required to set the default spatial resolution of the MISR data products `L1REGM` and `L1RTGM`. In those latter cases, if either or both of those keywords are missing, the spatial resolution is set to the value 1375. In all other cases, these keywords can be ignored.
+* This function generates and returns a filename but does not actually create or save a file by that name.
+* The MISRHR processing system assumes that all product filenames contain 8 elements (aside from the file extension) separated by an underscore (`_`), so that character should not be part of any one of the filename elements. For instance, since MISR Local Site names are formatted as `SITE_NAME`, function `make_location.jl` replaces it by a dash (`-`) in MISRHR filenames. Similarly, function `make_versions.jl` replaces underscores in MISR version labels by dashes in MISRHR filenames. This convention does NOT apply to `misrhr_fpath`.
+* The positional arguments `ftype`, `prdct`, and `subprdct` are mandatory and must take on recognized values (validated by the functions `is_valid_misrhr_ftype`, either `is_valid_misr_prdct` or `is_valid_misrhr_prdct`, and either `is_valid_misr_subprdct` or `is_valid_misrhr_subprdct`), respectively.
+* The keyword argument `qualifier` can take on any string value. However, if absent or set to a null string, its value is reset to `main`.
+* The keyword argument `resolution` must be set to a recognized value within the MISRHR processing system. However, if unspecified, its value is derived from the positional argument `prdct`, and optionally from the keyword arguments `misr_camera` and `misr_band`. See the function `set_resolution.jl` for further details.
+* The keyword arguments `misr_camera` and `misr_band` do not contribute directly to the filename but are required to set the default spatial resolution of the MISR data products `L1REGM` and `L1RTGM` or of the MISRHR product `L1RTGMmvr`. In those latter cases, if either or both of those keywords are missing, the spatial resolution is set to the value 1375. In all other cases, these two keywords can be ignored.
 * Commented template to setup this function:
+
 ```
-ftype =                 [mandatory]
-prdct =                 [mandatory]
-subprdct =              [mandatory]
-qualifier =             [optional, if "" => "main"]
-resolution =            [optional, if 0 => defaults to resolution of prdct]
-misr_camera =           [optional, if nothing => ignored]
-misr_band =             [optional, if nothing => ignored]
-misr_path1 =            [mandatory]
-misr_path2 =            [optional, if nothing => ignored]
-misr_orbit1 =           [mandatory if strdate1 is not provided]
-misr_orbit2 =           [optional, if nothing => ignored]
-misr_block1 =           [mandatory for some prdct, otherwise ignored]
-misr_block2 =           [optional, if nothing => ignored]
-misr_site =             [optional, if nothing => ignored]
-misr_band =             [optional, if nothing => ignored]
-strdate1 =              [optional if misr_orbit1 is specified]
-strdate2 =              [optional]
-misr_version =          [optional if prdct is specified]
-misrhr_version =        [optional, if nothing => defaults to current value]
-ext =                   [optional, if nothing => defaults to ext of ftype]
+ftype =             [mandatory]
+prdct =             [mandatory]
+subprdct =          [mandatory]
+qualifier =         [optional, if nothing or "" => "main"]
+resolution =        [optional, if nothing or 0 => resolution of prdct]
+misr_camera =       [only for `L1REGM`, `L1RTGM` and `L1RTGMmvr`, otherwise ignored]
+misr_band =         [only for `L1REGM`, `L1RTGM` and `L1RTGMmvr`, otherwise ignored]
+misr_path1 =        [mandatory if `misr_orbit1` or `misr_block1` is specified]
+misr_path2 =        [optional, if nothing => ignored]
+misr_orbit1 =       [mandatory if `from` is not specified]
+misr_orbit2 =       [optional, if nothing or 0 => ignored]
+misr_block1 =       [optional, if nothing or 0 => ignored]
+misr_block2 =       [optional, if nothing or 0 => ignored]
+misr_site =         [optional, if nothing or "" => ignored]
+from =              [mandatory if `misr_orbit1` is not specified]
+until =             [optional, if nothing or "" => `from`]
+misr_version =      [optional, if nothing or "" => version of main `misr_prdct`]
+misrhr_version =    [optional, if nothing or "" => version of `misrhr_prdct`]
+ext =               [optional, if nothing or "" => extension of `ftype`]
 ```
 
 # Example 1:
@@ -102,10 +103,8 @@ julia> misr_block1 = 110
 110
 
 julia> misrhr_fname = make_misrhr_fname(ftype, prdct, subprdct;
-        misr_path1 = misr_path1,
-        misr_orbit1 = misr_orbit1,
-        misr_block1 = misr_block1)
-"Data_L1RCCMmvr_cldm_main_R1100_P168+O068050+B110_2012-10-03+2012-10-03+2023-07-13_F04-0025+v3.0.0.nc"
+        misr_path1 = misr_path1, misr_orbit1 = misr_orbit1, misr_block1 = misr_block1)
+"Data_L1RCCMmvr_cldm_main_R1100_P168+O068050+B110_2012-10-03+2012-10-03+2023-08-03_F04-0025+v3.0.0.nc"
 ```
 
 # Example 2:
@@ -143,7 +142,7 @@ julia> misrhr_fname = make_misrhr_fname(ftype, prdct, subprdct;
         qualifier = qualifier, misr_path1 = misr_path1,
         misr_orbit1 = misr_orbit1, misr_orbit2 = misr_orbit2,
         misr_block1 = misr_block1, misr_site = misr_site)
-"Map_L1RTLM_refl_test_R275_P168+O060000-O070000+B110+SITE-SKUKUZA_2011-03-30+2013-02-14+2023-07-14_F03-0024+v3.0.0.png"
+"Map_L1RTLM_refl_test_R275_P168+O060000-O070000+B110+SITE-SKUKUZA_2011-03-30+2013-02-14+2023-08-03_F03-0024+v3.0.0.png"
 ```
 
 # Example 3:
@@ -160,19 +159,19 @@ julia> subprdct = "geom"
 "geom"
 
 julia> misrhr_fname = make_misrhr_fname(ftype, prdct, subprdct)
-ERROR: make_dates: Missing information for the first date.
+ERROR: make_dates: Missing information for the `from` date.
 
 julia> misr_orbit1 = 68050
 68050
 
-julia> misrhr_fname = make_misrhr_fname(ftype, prdct, subprdct,misr_orbit1 = misr_orbit1)
+julia> misrhr_fname = make_misrhr_fname(ftype, prdct, subprdct, misr_orbit1 = misr_orbit1)
 ERROR: make_location: If a MISR Orbit or Block number is specified, a first Path number must also be specified.
 
 julia> misr_path1 = 168
 168
 
 julia> misrhr_fname = make_misrhr_fname(ftype, prdct, subprdct; misr_path1 = 168, misr_orbit1 = misr_orbit1)
-"Stats_L1GMP_geom_main_R17600_P168+O068050_2012-10-03+2012-10-03+2023-07-13_F03-0013+v3.0.0"
+"Stats_L1GMP_geom_main_R17600_P168+O068050_2012-10-03+2012-10-03+2023-08-03_F03-0013+v3.0.0"
 ```
 """
 function make_misrhr_fname(
@@ -190,104 +189,79 @@ function make_misrhr_fname(
     misr_block1::Union{Integer, Nothing} = nothing,
     misr_block2::Union{Integer, Nothing} = nothing,
     misr_site::Union{AbstractString, Nothing} = nothing,
-    strdate1::Union{AbstractString, Nothing} = nothing,
-    strdate2::Union{AbstractString, Nothing} = nothing,
+    from::Union{AbstractString, Nothing} = nothing,
+    until::Union{AbstractString, Nothing} = nothing,
     misr_version::Union{AbstractString, Nothing} = nothing,
     misrhr_version::Union{AbstractString, Nothing} = nothing,
     ext::Union{AbstractString, Nothing} = nothing
     )::AbstractString
 
     # Initialize the return value `misrhr_fname` with the file type:
-    if ftype !== nothing
+    if (ftype === nothing) | (ftype == "")
+        error("make_misrhr_fname: Positional argument `ftype` is required.")
+    else
         bool = is_valid_misrhr_ftype(ftype)
         if bool == true
             misrhr_fname = ftype
         else
             error("make_misrhr_fname: Positional argument `ftype` is unrecognized.")
         end
-    else
-        error("make_misrhr_fname: Positional argument `ftype` is required.")
     end
 
-    # Add the MISR or MISR-HR product name:
-    if prdct !== nothing
-        bool1, prdct_name, prdct_full_name, prdct_esdt = is_valid_misr_prdct(prdct)
-        if bool1 == true
-            misrhr_fname = misrhr_fname * '_' * prdct
-            misr_prdct = prdct
-            is_misr_prdct = true
-        else
-            bool2, prdct_full_name = is_valid_misrhr_prdct(prdct)
-            if bool2 == true
-                misrhr_fname = misrhr_fname * '_' * prdct
-                if prdct == "L1RCCMmvr"
-                    misr_prdct = "L1RCCM"
-                else 
-                    misr_prdct = "L1RTGM"
-                end
-                is_misr_prdct = false
-            else
-                error("make_misrhr_fname: Positional argument `prdct` is unrecognized.")
-            end
-        end
-    else
+    # Ensure the positional argument `prdct` is valid and add it to `misrhr_fname`, ensuring that it does not contain underscore characters:
+    if (prdct === nothing) | (prdct == "")
         error("make_misrhr_fname: Positional argument `prdct` is required.")
-    end
-
-    # Add the MISR or MISR-HR subproduct name:
-    if subprdct !== nothing
-        bool1, subprdct_name = is_valid_misr_subprdct(prdct, subprdct)
-        if bool1 == true
-            misrhr_fname = misrhr_fname * '_' * subprdct
-        else
-            bool2, subprdct_name = is_valid_misrhr_subprdct(prdct, subprdct)
-            if bool2 == true
-                misrhr_fname = misrhr_fname * '_' * subprdct
-            else
-                error("make_misrhr_fname: Positional argument `subprdct` is unrecognized.")
-            end
-        end
     else
-        error("make_misrhr_fname: Positional argument `subprdct` is required.")
+        is_misr_p, prdct_name, prdct_full_name, prdct_esdt = is_valid_misr_prdct(prdct)
+        is_misrhr_p, prdct_full_name = is_valid_misrhr_prdct(prdct)
+        if (is_misr_p == false) & (is_misrhr_p == false)
+            error("make_misrhr_fname: Positional argument `prdct` is unrecognized.")
+        end
     end
+    prod = replace(prdct, "_" => "-")
+    misrhr_fname = misrhr_fname * '_' * prod
 
-    # Add the subproduct qualifier:
-    if qualifier !== nothing
+    # Ensure the positional argument `subprdct` is valid and add it to `misrhr_fname`, ensuring that it does not contain underscore characters:
+    if (subprdct === nothing) | (subprdct == "")
+        error("make_misrhr_fname: Positional argument `subprdct` is required.")
+    else
+        is_misr_sp, subprdct_name = is_valid_misr_subprdct(prdct, subprdct)
+        is_misrhr_sp, subprdct_name = is_valid_misrhr_subprdct(prdct, subprdct)
+        if (is_misr_sp == false) & (is_misrhr_sp == false)
+            error("make_misrhr_fname: Positional argument `subprdct` is unrecognized.")
+        end
+    end
+    subp = replace(subprdct, "_" => "-")
+    misrhr_fname = misrhr_fname * '_' * subp
+
+    # Ensure the keyword argument `qualifier` is valid and add it to `misrhr_fname`, ensuring that it does not contain underscore characters:
+    if (qualifier === nothing) | (qualifier == "")
+        misrhr_fname = misrhr_fname * '_' * "main"
+    else
         qual = replace(qualifier, "_" => "-")
         misrhr_fname = misrhr_fname * '_' * qual
-    else
-        misrhr_fname = misrhr_fname * '_' * "main"
     end
 
-    # Add the product spatial resolution:
-    if resolution != 0
-        if (misr_prdct == "L1REGM") | (misr_prdct == "L1RTGM")
-            if (misr_camera !== nothing) & (misr_band !== nothing)
-                bool3, misr_resolution_string = is_valid_misr_resolution(misr_resolution; misr_prdct = misr_prdct, misr_camera = misr_camera, misr_band = misr_band)
-            else
-                misr_resolution_string = 1375
-            end
-        else
-            bool3, misr_resolution_string = is_valid_misr_resolution(misr_resolution; misr_prdct = misr_prdct)
-            if bool3 == false
-                error("make_misrhr_fname: Positional argument `resolution` is invalid for a MISR product.")
-            end
-        end
+    # Set the primary MISR product on which the MISRHR product depends:
+    if is_misr_p
+        misr_prdct = prdct
     else
-        if (misr_prdct == "L1REGM") | (misr_prdct == "L1RTGM")
-            if (misr_camera !== nothing) & (misr_band !== nothing)
-                misr_resolution = set_misr_resol(misr_prdct;
-                    misr_camera = misr_camera, misr_band = misr_band)
-                bool3, misr_resolution_string = is_valid_misr_resolution(misr_resolution; misr_prdct = misr_prdct, misr_camera = misr_camera, misr_band = misr_band)
-            else
-                misr_resolution_string = 1375
-            end
-        else
-            misr_resolution = set_misr_resol(misr_prdct)
-            bool3, misr_resolution_string = is_valid_misr_resolution(misr_resolution)
+        if prdct == "L1RCCMmvr"
+            misr_prdct = "L1RCCM"
+        else 
+            misr_prdct = "L1RTGM"
         end
     end
-    misrhr_fname = misrhr_fname * '_' * misr_resolution_string
+
+    # Ensure the keyword argument `resolution` is valid and add it to `misrhr_fname`:
+    if (resolution === nothing) | (resolution == 0)
+        resolution = set_resolution(prdct;
+            misr_camera = misr_camera, misr_band = misr_band)
+        bool, resolution_string = is_valid_resolution(resolution; prdct = prdct, misr_camera = misr_camera, misr_band = misr_band)
+    else
+        bool, resolution_string = is_valid_resolution(resolution; prdct = prdct, misr_camera = misr_camera, misr_band = misr_band)
+    end
+    misrhr_fname = misrhr_fname * '_' * resolution_string
 
     # Add the location information:
     location = make_location(;
@@ -298,14 +272,8 @@ function make_misrhr_fname(
     misrhr_fname = misrhr_fname * '_' * location
 
     # Add the date information:
-    if strdate1 === nothing
-        strdate1 = ""
-    end
-    if strdate2 === nothing
-        strdate2 = ""
-    end
-    dates, date1, date2, date3 = make_dates(strdate1, strdate2; misr_orbit1, misr_orbit2)
-    misrhr_fname = misrhr_fname * '_' * dates
+    from_date, until_date, today_date, from_str, until_str, today_str, dates_str = make_dates(from, until; misr_orbit1 = misr_orbit1, misr_orbit2 = misr_orbit2)
+    misrhr_fname = misrhr_fname * '_' * dates_str
 
     # Add the versioning information:
     if misr_version === nothing
@@ -321,12 +289,14 @@ function make_misrhr_fname(
     if ext !== nothing
         misrhr_fname = misrhr_fname * ext
     else
-        if ((ftype == "Caption") |
-            (ftype == "Log"))
+        if (ftype == "Caption") |
+            (ftype == "Log") |
+            (ftype == "Stats")
             misrhr_fname = misrhr_fname * ".txt"
         elseif (ftype == "Doc")
             misrhr_fname = misrhr_fname * ".pdf"
-        elseif ftype == "Data"
+        elseif (ftype == "Data") |
+            (ftype == "Save")
             misrhr_fname = misrhr_fname * ".nc"
         elseif ((ftype == "Contour") |
             (ftype == "Map") |
