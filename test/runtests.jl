@@ -19,10 +19,42 @@ using Test
     orbit_date, orbit_date_string = get_orbit_date_tst_NoFmt();
     @test orbit_date == Date("2012-10-03")
     @test orbit_date_string == "2012-10-03"
-# ---------------------------------------------------------- is_valid_ftype
-    include(Tools_test * "is_valid_ftype_tst_Caption.jl")
-    bool = is_valid_ftype_tst_Caption();
-    @test bool == true
+# ---------------------------------------------------------- hr2lr
+    include(Tools_test * "hr2lr_tst_Brf.jl")
+    matrix_lr = hr2lr_tst_Brf();
+    @test matrix_lr == [
+        0.12  0.14
+        0.16  0.18
+        0.25  0.0]
+
+    include(Tools_test * "hr2lr_tst_LWCMask.jl")
+    matrix_lr = hr2lr_tst_LWCMask();
+    @test matrix_lr == [
+        0x01  0x02  0x03
+        0x02  0x01  0x03
+        0x03  0xfe  0x02
+        0xfe  0xfe  0x01]
+
+    include(Tools_test * "hr2lr_tst_Rad.jl")
+    matrix_lr = hr2lr_tst_Rad();
+    @test matrix_lr == [
+        350.0  400.0  450.0
+        340.0  330.0  310.0]
+
+    include(Tools_test * "hr2lr_tst_Radrd.jl")
+    matrix_lr = hr2lr_tst_Radrd();
+    @test matrix_lr == [
+        32752;
+        32248;
+        32192;
+        32152;
+        32191;;]
+
+    include(Tools_test * "hr2lr_tst_RDQI.jl")
+    matrix_lr = hr2lr_tst_RDQI();
+    @test matrix_lr == [
+        0x00  0x01
+        0x02  0x03]
 # ---------------------------------------------------------- is_valid_misr_band
 include(Tools_test * "is_valid_misr_band_tst_Blue.jl")
     bool = is_valid_misr_band_tst_Blue();
@@ -83,11 +115,6 @@ include(Tools_test * "is_valid_misr_band_tst_Blue.jl")
     @test prdct_name == "GRP_RCCM_GM"
     @test prdct_full_name == "Radiometric Camera-by-Camera Cloud Mask Product"
     @test prdct_esdt == "MIRCCM"
-# ---------------------------------------------------------- is_valid_misr_resolution
-    include(Tools_test * "is_valid_misr_resolution_tst_1100.jl")
-    bool, misr_resolution_string = is_valid_misr_resolution_tst_1100();
-    @test bool == true
-    @test misr_resolution_string == "R1100"
 # ---------------------------------------------------------- is_valid_misr_site
     include(Tools_test * "is_valid_misr_site_tst_egypt1.jl")
     bool, misr_site_label = is_valid_misr_site_tst_egypt1();
@@ -99,6 +126,10 @@ include(Tools_test * "is_valid_misr_band_tst_Blue.jl")
     @test bool == false
     @test misr_site_label == "The positional argument misr_site is not recognized."
 # ---------------------------------------------------------- is_valid_misrhr_ftype
+    include(Tools_test * "is_valid_misrhr_ftype_tst_Caption.jl")
+    bool = is_valid_misrhr_ftype_tst_Caption();
+    @test bool == true
+
     include(Tools_test * "is_valid_misrhr_ftype_tst_Map1.jl")
     bool = is_valid_misrhr_ftype_tst_Map1();
     @test bool == true
@@ -116,20 +147,59 @@ include(Tools_test * "is_valid_misr_band_tst_Blue.jl")
     bool, prdct_full_name = is_valid_misrhr_prdct_tst_TIP();
     @test bool == true
     @test prdct_full_name == "Two-stream Inversion Package"
+# ---------------------------------------------------------- is_valid_resolution
+    include(Tools_test * "is_valid_resolution_tst_1100.jl")
+    bool, resolution_string = is_valid_resolution_tst_1100();
+    @test bool == true
+    @test resolution_string == "R1100"
+# ---------------------------------------------------------- lr2hr
+    include(Tools_test * "lr2hr_tst_Integer.jl")
+    matrix_hr = lr2hr_tst_Integer();
+    @test matrix_hr == [
+        1  1  2  2
+        1  1  2  2
+        3  3  4  4
+        3  3  4  4]
+
+    include(Tools_test * "lr2hr_tst_Real.jl")
+    matrix_hr = lr2hr_tst_Real();
+    @test matrix_hr == [
+        1.1  1.1  2.2  2.2  3.3  3.3  4.4  4.4
+        1.1  1.1  2.2  2.2  3.3  3.3  4.4  4.4
+        5.5  5.5  6.6  6.6  7.7  7.7  8.8  8.8
+        5.5  5.5  6.6  6.6  7.7  7.7  8.8  8.8]
+
+    include(Tools_test * "lr2hr_tst_String.jl")
+    matrix_hr = lr2hr_tst_String();
+    @test matrix_hr == [
+        "white"   "white"   "white"   "black"   "black"   "black"
+        "white"   "white"   "white"   "black"   "black"   "black"
+        "white"   "white"   "white"   "black"   "black"   "black"
+        "yellow"  "yellow"  "yellow"  "orange"  "orange"  "orange"
+        "yellow"  "yellow"  "yellow"  "orange"  "orange"  "orange"
+        "yellow"  "yellow"  "yellow"  "orange"  "orange"  "orange"
+        "blue"    "blue"    "blue"    "green"   "green"   "green"
+        "blue"    "blue"    "blue"    "green"   "green"   "green"
+        "blue"    "blue"    "blue"    "green"   "green"   "green"]
 # ---------------------------------------------------------- make_dates
-    include(Tools_test * "make_dates_tst_1000.jl")
-    dates, date1, date2, date3 = make_dates_tst_1000();
-    @test dates == "2012-06-13+2012-06-13+" * Dates.format(today(), "yyyy-mm-dd")
-    @test date1 == Date("2012-06-13")
-    @test date2 == Date("2012-06-13")
-    @test date3 == today()
+include(Tools_test * "make_dates_tst_1000.jl")
+    from_date, until_date, today_date, from_str, until_str, today_str, dates_str = make_dates_tst_1000();
+    @test from_date == Date("2012-06-13")
+    @test until_date == Date("2012-06-13")
+    @test today_date == Dates.today()
+    @test from_str == "2012-06-13"
+    @test until_str == "2012-06-13"
+    @test today_str == Dates.format(today_date, "yyyy-mm-dd")
+    @test dates_str == from_str * '+' * until_str * '+' * today_str
 
     include(Tools_test * "make_dates_tst_1100.jl")
-    dates, date1, date2, date3 = make_dates_tst_1100();
-    @test dates == "2012-06-13+2014-06-28+" * Dates.format(today(), "yyyy-mm-dd")
-    @test date1 == Date("2012-06-13")
-    @test date2 == Date("2014-06-28")
-    @test date3 == today()
+    from_date, until_date, today_date, from_str, until_str, today_str, dates_str = make_dates_tst_1100();
+    @test until_date == Date("2014-06-28")
+    @test today_date == Dates.today()
+    @test from_str == "2012-06-13"
+    @test until_str == "2014-06-28"
+    @test today_str == Dates.format(today_date, "yyyy-mm-dd")
+    @test dates_str == from_str * '+' * until_str * '+' * today_str
 # ---------------------------------------------------------- make_location
 include(Tools_test * "make_location_tst_1.jl")
     location = make_location_tst_1();
@@ -204,6 +274,22 @@ include(Tools_test * "make_location_tst_1.jl")
     include(Tools_test * "make_misrhr_fname_tst_L1RTLM.jl")
     misrhr_fname = make_misrhr_fname_tst_L1RTLM();
     @test misrhr_fname == "Map_L1RTLM_refl_test_R275_P168+O060000-O070000+B110+SITE-SKUKUZA_2011-03-30+2013-02-14+" * Dates.format(today(), "yyyy-mm-dd") * "_F03-0024+v3.0.0.png"
+# ---------------------------------------------------------- make_misrhr_fpath
+    include(Tools_test * "make_misrhr_fpath_tst_L1RCCMmvrMap.jl")
+    misrhr_fpath = make_misrhr_fpath_tst_L1RCCMmvrMap();
+    @test misrhr_fpath == "/Users/michel/Projects/MISR/Scrap/John/Test/P168-P170+O068000-O072000+SITE-SKUKUZA/make_misrhr_fpath/L1RCCMmvr/Map/"
+
+    include(Tools_test * "make_misrhr_fpath_tst_NoArgs.jl")
+    misrhr_fpath = make_misrhr_fpath_tst_NoArgs();
+    @test misrhr_fpath == "~/Dev/Test/NOLOC/make_misrhr_fpath/all_prdcts/all_ftypes/"
+
+    include(Tools_test * "make_misrhr_fpath_tst_L1B3.jl")
+    misrhr_fpath = make_misrhr_fpath_tst_L1B3();
+    @test misrhr_fpath == "/Users/michel/Projects/MISR/Scrap/Dev/Test/P168+O068050+B110/make_misrhr_fpath/L1B3/Data/"
+# ---------------------------------------------------------- make_misrhr_fspec
+    include(Tools_test * "make_misrhr_fspec_tst_L2LAND.jl")
+    misrhr_fspec = make_misrhr_fspec_tst_L2LAND();
+    @test misrhr_fspec == "/Users/michel/Projects/MISR/Scrap/MMV/Explore/P192-P194+O080000-O082000+B056-B058/make_misrhr_fpath/L2LAND/Map/Map_L2LAND_Bidirectional-Reflectance-Factor_main_R1100_P192-P194+O080000-O082000+B056-B058_2015-01-01+2015-05-19+" * Dates.format(today(), "yyyy-mm-dd") * "_F08-0023+v3.0.0.png"
 # ---------------------------------------------------------- set_misr_specs
     include(Tools_test * "set_misr_specs_tst_1.jl")
     misr_specs = set_misr_specs_tst_1();
